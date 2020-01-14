@@ -1,0 +1,17 @@
+list DTO를 json으로 바꾸는 방법
+Map<String,dynamic> toJson(){
+    return {
+      "name": this.name,
+      "imagePath": this.imagePath,
+      "totalGames": this.totalGames,
+      "points": this.points
+    };
+  }
+
+static List encondeToJson(List<Player>list){
+    List jsonList = List();
+    list.map((item)=>
+      jsonList.add(item.toJson())
+    ).toList();
+    return jsonList;
+}
