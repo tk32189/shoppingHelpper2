@@ -338,6 +338,7 @@ class FirstBloc {
     //map["usrId"] = "D930004";
     map["ordrDirectDt"] = "";
     map["stodNo"] = this.stodNo;
+    map["showDt"] = titleInfo["showDt"];
 
     // List jsonList = List();
     // body.map((item) => jsonList.add(item.toMap())).toList();

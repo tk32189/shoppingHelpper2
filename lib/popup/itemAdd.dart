@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart' as prefix0;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:showpinghelper/datatable/orderDTO.dart';
 import 'package:showpinghelper/datatable/resultDataDTO.dart';
 
@@ -132,6 +133,7 @@ Widget ItemAddPopup(BuildContext context, ResultData inputData){
                   TextFormField(
                     initialValue: exptPrice,
                     keyboardType: TextInputType.number,
+                    //inputFormatters: [ BlacklistingTextInputFormatter()  ],
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: '예상가격',

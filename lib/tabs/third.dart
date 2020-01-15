@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:showpinghelper/bloc/thirdBloc.dart';
+import 'package:showpinghelper/core/coreLibrary.dart';
 import 'package:showpinghelper/tabs/first.dart';
 import 'package:showpinghelper/datatable/titleDTO.dart';
 
@@ -144,16 +145,31 @@ class DualHeaderWithHint extends StatelessWidget {
 }
 
 class DemoItem<T> {
-  DemoItem({
-    this.name,
-    this.value,
-    this.hint,
-    this.builder,
-    this.valueToString,
-  }) : textController = TextEditingController(text: valueToString(value));
+  DemoItem(
+      {this.name,
+      this.value,
+      this.hint,
+      this.builder,
+      this.valueToString,
+      this.showDt,
+      this.ordrInfo,
+      this.stodNo})
+      : textController = TextEditingController(text: valueToString(value));
 
   final String name;
   final String hint;
+
+  final String showDt; //쇼핑일자
+  String ordrInfo = ""; //쇼핑정보
+  String stodNo = ""; //
+
+  String getOrdrInfo() {
+    if (ordrInfo != null) {
+      return ordrInfo;
+    } else
+      return "";
+  }
+
   final TextEditingController textController;
   final DemoItemBodyBuilder<T> builder;
   final ValueToString<T> valueToString;
@@ -175,12 +191,8 @@ class DemoItem<T> {
 }
 
 class ThirdTab extends StatefulWidget {
-  ThirdTab({
-    Key key
-    , this.onSave
-    , this.onResearch
-    , this.firstTabStateKey
-  }) : super (key: key);
+  ThirdTab({Key key, this.onSave, this.onResearch, this.firstTabStateKey})
+      : super(key: key);
 
   final VoidCallback onSave;
   //GlobalKey<FirstTabState> firstTabState;
@@ -194,7 +206,7 @@ class ThirdTab extends StatefulWidget {
   BuildContext context;
 
   @override
-  ThirdTabState createState() =>ThirdTabState();
+  ThirdTabState createState() => ThirdTabState();
 
   // @override
   // State<StatefulWidget> createState() {
@@ -225,7 +237,7 @@ class ThirdTabState extends State<ThirdTab> {
 
     if (thrdBloc != null) {
       thrdBloc.buildContext = context;
-      
+
       thrdBloc.SelectTitleList(thrdBloc.userId);
       this.isNeedToSelect = true;
     }
@@ -399,11 +411,15 @@ class ThirdTabState extends State<ThirdTab> {
     // ];
   }
 
+  //타이틀 정보를 설정한다.
   DemoItem<String> TitleControlInit(TitleDTO title) {
     return DemoItem<String>(
       name: title.ordrDirectDt,
       value: title.stodNo,
       hint: title.titlNm,
+      showDt: title.showDt,
+      ordrInfo: title.ordrInfo,
+      stodNo: title.stodNo,
       valueToString: (String value) => value,
       builder: (DemoItem<String> item) {
         void close() {
@@ -419,26 +435,67 @@ class ThirdTabState extends State<ThirdTab> {
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 onSave: () {
                   Form.of(context).save();
+                  widget.onResearch(item.stodNo);
                   close();
                 },
                 onCancel: () {
                   Form.of(context).reset();
+                  //ShowMessageBox(context, "확인", "정말 삭제하시겠습니까?");
+                  String titlNm = title.titlNm;
+                  ShowMessageBoxWithConfirm(context, "삭제", "[$titlNm]\r\n\r\n정말 삭제하시겠습니까?")
+                      .then((ConfirmAction onValue) {
+                    if (onValue == ConfirmAction.ACCEPT) {
+                        //TODO 삭제처리 해야함..
+
+                    } else if (onValue == ConfirmAction.CANCEL) {
+                      //PASS
+                    }
+                  });
+
                   close();
                 },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: TextFormField(
-                    controller: item.textController,
-                    decoration: InputDecoration(
-                      hintText: item.hint,
-                      labelText: item.name,
-                    ),
-                    onSaved: (String value) {
-                      item.value = value;
-                      widget.onResearch(value);
-                      //widget.firstTabStateKey.currentState.onDataReceivedsingle("11111");
-                    },
+                //455
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      Text('쇼핑일 : ' + StringToDisplayDate(item.showDt)),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        item.getOrdrInfo(),
+                        style: TextStyle(fontSize: 20, color: Colors.black),
+                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      //   child: TextFormField(
+                      //     //controller: item.textController,
+                      //     // decoration: InputDecoration(
+                      //     //   hintText: item.hint,
+                      //     //   labelText: item.name,
+                      //     // ),
+                      //     onSaved: (String value) {
+                      //       item.value = value;
+                      //       //widget.onResearch(item.stodNo);
+                      //     },
+                      //   ),
+                      // ),
+                    ],
                   ),
+                  // child: Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  //   child: TextFormField(
+                  //     controller: item.textController,
+                  //     decoration: InputDecoration(
+                  //       hintText: item.hint,
+                  //       labelText: item.name,
+                  //     ),
+                  //     onSaved: (String value) {
+                  //       item.value = value;
+                  //       widget.onResearch(value);
+                  //     },
+                  //   ),
+                  // ),
                 ),
               );
             },

@@ -17,8 +17,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: '쇼핑리스트'),
+      home: MyHomePage(title: titleName),
     );
+  }
+
+  String titleName = "쇼핑리스트";
+
+  void ChangeTitle(String inTitleName) {
+    titleName = inTitleName;
   }
 }
 
@@ -29,8 +35,6 @@ class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
-
-
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
@@ -43,10 +47,24 @@ class _MyHomePageState extends State<MyHomePage>
   final fooState = GlobalKey<FirstTabState>();
 
   //GlobalKey<FirstTabState> _keyChild1 = GlobalKey();
-  
 
   final _keyChild2 = GlobalKey<FirstTabState>();
-  
+
+  String titleNmae = "쇼핑리스트";
+
+  //탭 선택 변경시 이벤트 처리
+  void _setActiveTabIndex() {
+    setState(() {
+      if (controller.index == 0) {
+        //widget.ChangeTitle("")
+        titleNmae = "쇼핑리스트";
+      } else if (controller.index == 1) {
+        titleNmae = "아직미정";
+      } else if (controller.index == 2) {
+        titleNmae = "히스토리";
+      }
+    });
+  }
 
   //히스토리에서 재조회 버튼 클릭시
   ResearchButtonClick(String value) {
@@ -57,14 +75,13 @@ class _MyHomePageState extends State<MyHomePage>
     //fooState.currentState.onDataReceivedsingle("11111");
 
     firstTab.sendData("updateTitleInfo", value);
-    
-
   }
 
   @override
   void initState() {
     super.initState();
     controller = new TabController(length: 3, vsync: this);
+    controller.addListener(_setActiveTabIndex);
 
     FirstTab(key: animatedStateKey);
 
@@ -84,19 +101,19 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
-     firstTab = new FirstTab(
-     );
+    firstTab = new FirstTab();
     SecondTab secondTab = new SecondTab();
-    ThirdTab thirdTab = new ThirdTab(onResearch: ResearchButtonClick, firstTabStateKey: animatedStateKey,);
+    ThirdTab thirdTab = new ThirdTab(
+      onResearch: ResearchButtonClick,
+      firstTabStateKey: animatedStateKey,
+    );
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(titleNmae),
         backgroundColor: new Color(0xFFE57373),
       ),
       body: new TabBarView(
-        children: <Widget>[
-          firstTab
-          , secondTab, thirdTab],
+        children: <Widget>[firstTab, secondTab, thirdTab],
         controller: controller,
       ),
       bottomNavigationBar: new Material(

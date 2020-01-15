@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:showpinghelper/bloc/firstBloc.dart';
 import 'package:showpinghelper/datatable/orderDTO.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -81,6 +82,7 @@ class FirstTabState extends State<FirstTab> {
       //showPopup(mainContext, ItemAddPopup(), "물품 추가");
     }
   }
+
   DateTime showpingDate = DateTime.now();
 
   @override
@@ -89,7 +91,7 @@ class FirstTabState extends State<FirstTab> {
     String titlNm = ""; //타이틀명
     String userId = "D930004";
     //String showpingDate = DateTime.now().toString();
-    
+
     Key txtLabel = new Key("txtLabel");
     TextEditingController titleController = TextEditingController();
     if (firstBloc != null) {
@@ -136,6 +138,7 @@ class FirstTabState extends State<FirstTab> {
 
                           map["titlNm"] = titlNm;
                           map["userId"] = userId;
+                          map["showDt"] = DateToString(showpingDate);
                           firstBloc.OnSaveData(map);
                         },
                       ),
@@ -151,31 +154,33 @@ class FirstTabState extends State<FirstTab> {
                         },
                       ),
                     ),
-                    new Container(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: RaisedButton(
-                        color: Colors.blue[400],
-                        child: Text("테스트 버튼",
-                            style: TextStyle(color: Colors.white)),
-                        onPressed: () {
-                          DatePicker.showDatePicker(context,
-                              theme: DatePickerTheme(containerHeight: 210.0),
-                              showTitleActions: true,
-                              minTime: DateTime(2000, 1, 1),
-                              maxTime: DateTime(2022, 12, 31),
-                              currentTime: DateTime.now(),
-                              locale: LocaleType.ko, onConfirm: (date) {
-                            print(date);
-                            print(date);
-                          });
-                        },
-                      ),
-                    ),
+                    //테스트 버튼
+                    // new Container(
+                    //   padding: const EdgeInsets.only(right: 10),
+                    //   child: RaisedButton(
+                    //     color: Colors.blue[400],
+                    //     child: Text("테스트 버튼",
+                    //         style: TextStyle(color: Colors.white)),
+                    //     onPressed: () {
+                    //       DatePicker.showDatePicker(context,
+                    //           theme: DatePickerTheme(containerHeight: 210.0),
+                    //           showTitleActions: true,
+                    //           minTime: DateTime(2000, 1, 1),
+                    //           maxTime: DateTime(2022, 12, 31),
+                    //           currentTime: DateTime.now(),
+                    //           locale: LocaleType.ko, onConfirm: (date) {
+                    //         print(date);
+                    //         print(date);
+                    //       });
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
                 const SizedBox(
                   height: 10,
                 ),
+                //쇼핑일 날짜박스
                 Container(
                   margin: EdgeInsets.only(left: 10, bottom: 5),
                   alignment: Alignment.centerLeft,
@@ -219,7 +224,7 @@ class FirstTabState extends State<FirstTab> {
                             width: 20,
                           ),
                           Text(
-                            "${showpingDate.year}-${showpingDate.month}-${showpingDate.day}",
+                            DateToStringForDisplay(showpingDate),
                             style: TextStyle(
                                 color: Colors.teal,
                                 fontWeight: FontWeight.bold,
@@ -230,7 +235,9 @@ class FirstTabState extends State<FirstTab> {
                     ),
                   ),
                 ),
+                //타이틀 텍스트 박스
                 Container(
+                  margin: EdgeInsets.only(left: 10, bottom: 5),
                   child: StreamBuilder<String>(
                       stream: firstBloc.getTitleNm,
                       builder: (context, snapshot) {
@@ -238,17 +245,24 @@ class FirstTabState extends State<FirstTab> {
                             TextEditingValue(text: "${snapshot.data}");
                         titlNm = snapshot.data;
                         return TextFormField(
-                          
                           controller: titleController,
+                          style: TextStyle(
+                              color: Colors.teal,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0),
                           //initialValue: ordrName,
                           textCapitalization: TextCapitalization.words,
 
                           decoration: const InputDecoration(
-                            //border: UnderlineInputBorder(),
-                            //filled: true,
-                            
-                            //icon: Icon(Icons.add_shopping_cart),
+                            border: InputBorder.none,
+                            //labelText: '타이틀',
                             hintText: '쇼핑명을 입력하세요',
+                            prefixText: '타이틀 : ',
+                            // labelStyle: TextStyle(
+                            //     color: Colors.teal,
+                            //     fontWeight: FontWeight.bold,
+                            //     fontSize: 18.0),
+
                             //labelText: '쇼핑명 *',
                           ),
 
@@ -261,6 +275,7 @@ class FirstTabState extends State<FirstTab> {
                         );
                       }),
                 ),
+                
               ],
             ),
           ),
@@ -293,6 +308,9 @@ class FirstTabState extends State<FirstTab> {
                             }
 
                             String exptPrice = item.exptPrice;
+                            final f = new NumberFormat("#,###");
+                            double price = double.parse(exptPrice);
+                            String exptPriceFormated = f.format(price);
 
                             bool exptPriceVisible = false;
                             if (item.exptPrice != null) {
@@ -378,7 +396,7 @@ class FirstTabState extends State<FirstTab> {
                                                   child: new Row(
                                                     children: <Widget>[
                                                       new Text(
-                                                        '($exptPrice원)',
+                                                        '($exptPriceFormated원)',
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.green),
