@@ -61,8 +61,6 @@ Widget ItemAddPopup(BuildContext context, ResultData inputData){
 
     }
 
-    
-
 
 
     return SafeArea(
@@ -170,42 +168,6 @@ Widget ItemAddPopup(BuildContext context, ResultData inputData){
                   resultData.resultObject = order;
                     Navigator.pop<ResultData>(context, resultData); //close the popup
                   },)
-                  // const SizedBox(height: 24.0),
-                  // PasswordField(
-                  //   fieldKey: _passwordFieldKey,
-                  //   helperText: 'No more than 8 characters.',
-                  //   labelText: 'Password *',
-                  //   onFieldSubmitted: (String value) {
-                  //     setState(() {
-                  //       person.password = value;
-                  //     });
-                  //   },
-                  // ),
-                  // const SizedBox(height: 24.0),
-                  // TextFormField(
-                  //   enabled: person.password != null && person.password.isNotEmpty,
-                  //   decoration: const InputDecoration(
-                  //     border: UnderlineInputBorder(),
-                  //     filled: true,
-                  //     labelText: 'Re-type password',
-                  //   ),
-                  //   maxLength: 8,
-                  //   obscureText: true,
-                  //   validator: _validatePassword,
-                  // ),
-                  // const SizedBox(height: 24.0),
-                  // Center(
-                  //   child: RaisedButton(
-                  //     child: const Text('SUBMIT'),
-                  //     onPressed: _handleSubmitted,
-                  //   ),
-                  // ),
-                  // const SizedBox(height: 24.0),
-                  // Text(
-                  //   '* indicates required field',
-                  //   style: Theme.of(context).textTheme.caption,
-                  // ),
-                  // const SizedBox(height: 24.0),
                 ],
               ),
             ),

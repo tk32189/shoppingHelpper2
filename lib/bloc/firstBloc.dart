@@ -16,53 +16,62 @@ class FirstBloc {
 
   final _orderSubject = BehaviorSubject<List<OrderDTO>>();
   final _titleNmSubJect = BehaviorSubject<String>();
+  final _showDtSubject = BehaviorSubject<DateTime>();
   //final _stodNoSubject = BehaviorSubject<String>();
   Stream<List<OrderDTO>> get resultList => _orderSubject.stream;
   Stream<String> get getTitleNm => _titleNmSubJect.stream;
+  Stream<DateTime> get getShowDt => _showDtSubject.stream;
   setTitleNm(String titleNm) {
     _titleNmSubJect.add(titleNm);
   }
+
+  setShowDt(DateTime datetime){
+    _showDtSubject.add(datetime);
+  }
+
+
 
   BuildContext buildContext;
 
   String get getStodNo => stodNo;
 
-  String userId = "D930004";
+  //String userId = "D930004";
   String stodNo = "";
+  String lastUsrId = "";
 
   //String titleNm = "";
 
   String url = "http://10.0.2.2:3000/";
 
   FirstBloc() {
-    OrderDTO dto = new OrderDTO();
-    dto.ordrNo = "1";
-    dto.rowIndex = "1";
-    dto.ordrNm = "강아지사료";
-    dto.ordrCd = "CD1";
-    dto.ordrDirectDt = "20190507";
-    dto.vistSn = "1";
-    dto.subOrdrNm = " ";
-    dto.ordrCnt = "1";
+    // OrderDTO dto = new OrderDTO();
+    // dto.ordrNo = "1";
+    // dto.rowIndex = "1";
+    // dto.ordrNm = "강아지사료";
+    // dto.ordrCd = "CD1";
+    // dto.ordrDirectDt = "20190507";
+    // dto.vistSn = "1";
+    // dto.subOrdrNm = " ";
+    // dto.ordrCnt = "1";
 
-    orderList.add(dto);
+    // orderList.add(dto);
 
-    dto = new OrderDTO();
-    dto.ordrNo = "2";
-    dto.rowIndex = "2";
-    dto.ordrNm = "커피";
-    dto.ordrCd = "CD2";
-    dto.ordrDirectDt = "20190507";
-    dto.vistSn = "1";
-    dto.subOrdrNm = " ";
-    dto.ordrCnt = "1";
+    // dto = new OrderDTO();
+    // dto.ordrNo = "2";
+    // dto.rowIndex = "2";
+    // dto.ordrNm = "커피";
+    // dto.ordrCd = "CD2";
+    // dto.ordrDirectDt = "20190507";
+    // dto.vistSn = "1";
+    // dto.subOrdrNm = " ";
+    // dto.ordrCnt = "1";
 
-    orderList.add(dto);
+    // orderList.add(dto);
 
     _orderSubject.add(orderList);
 
-    if (this.userId != null && this.userId != "") {
-      this.SelectLastStodNo(this.userId); //마지막 stodNO조회
+    if (CoreLibrary.userId != null && CoreLibrary.userId != "") {
+      this.SelectLastStodNo(CoreLibrary.userId); //마지막 stodNO조회
     }
   }
 
@@ -197,8 +206,8 @@ class FirstBloc {
 
   void OnSelectData() {
     //this.SelectShowingData(this.userId, this.stodNo);
-    if (this.userId != null && this.userId != "") {
-      this.SelectLastStodNo(this.userId); //마지막 stodNO조회
+    if (CoreLibrary.userId != null && CoreLibrary.userId != "") {
+      this.SelectLastStodNo(CoreLibrary.userId); //마지막 stodNO조회
     }
   }
 
@@ -212,6 +221,7 @@ class FirstBloc {
     this.orderList = new List<OrderDTO>();
     this._orderSubject.add(orderList);
     this._titleNmSubJect.add("");
+    this._showDtSubject.add(DateTime.now());
   }
 
   /*--------------------------
@@ -221,7 +231,7 @@ class FirstBloc {
   ---------------------------*/
   void SelectTitleInfo(String stodNo)
   {
-    this.SelectShowpingData(this.userId, stodNo);
+    this.SelectShowpingData(CoreLibrary.userId, stodNo);
   }
 
   /*--------------------------
@@ -251,7 +261,7 @@ class FirstBloc {
           if (stodNo != "") {
             this.stodNo = stodNo;
             //마지막 저장된 내역이 있음.
-            this.SelectShowpingData(this.userId, stodNo);
+            this.SelectShowpingData(CoreLibrary.userId, stodNo);
           }
         }
       }
@@ -268,6 +278,7 @@ class FirstBloc {
 
     if (userId != null && userId != "") {
       map["usrId"] = userId;
+      this.lastUsrId = userId;
     }
 
     if (stodNo != null && stodNo != "") {
@@ -287,6 +298,14 @@ class FirstBloc {
 
       if (result.containsKey("stodNo")) {
         this.stodNo = result["stodNo"].toString();
+      }
+
+      if ( result.containsKey("showDt")){
+
+          DateTime dt = DateTime.parse(result["showDt"].toString());
+        _showDtSubject.add(dt);
+
+
       }
 
       if (result.containsKey("orderData")) {

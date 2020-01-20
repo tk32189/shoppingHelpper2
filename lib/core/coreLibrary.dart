@@ -5,6 +5,36 @@ import 'package:showpinghelper/datatable/resultDataDTO.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
+class CoreLibrary {
+  static String userId = ""; //
+
+  /*--------------------------
+  // name : AuthRead
+  // title : 사용자 확인용 아이디 조회
+  // desc : 
+  ---------------------------*/
+  Future AuthRead() async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      return await File(dir.path + '/ShoppingHelperAuth.txt').readAsString();
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  /*--------------------------
+  // name : AuthWrite
+  // title : 사용자 확인용 아이디 저장
+  // desc : 
+  ---------------------------*/
+  Future AuthWrite(String value) async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File(dir.path + '/ShoppingHelperAuth.txt').writeAsString(value.toString());
+  }
+}
 
 String url = "http://10.0.2.2:3000/";
 
@@ -51,6 +81,7 @@ Future<Object> showPopup(BuildContext context, Widget widget, String title,
   ---------------------------*/
 Future<dynamic> CallService(
     BuildContext buildContext, String connectKey, Map body) async {
+
   return await http.post(Uri.encodeFull(url + connectKey),
       body: body,
       headers: {"Accept": "application/json"}).then((http.Response response) {
@@ -125,6 +156,16 @@ void ShowSnackBar(BuildContext buildContext, String message) {
 }
 
 /*--------------------------
+  // name : AMessageBoxShow
+  // title : 스낵바를 표시한다.( ShowSnackBar 와 동일기능)
+  // desc : 
+  ---------------------------*/
+void AMessageBoxShow(BuildContext buildContext, String message)
+{
+  ShowSnackBar(buildContext, message);
+}
+
+/*--------------------------
   // name : DateToString
   // title : 날짜타입을 StringType으로 변경한다.
   // desc : 
@@ -167,7 +208,8 @@ String StringToDisplayDate(String value) {
   // title : 메시지 박스를 호출한다.
   // desc : 
   ---------------------------*/
-Future<void> ShowMessageBox(BuildContext context, String title, String message) {
+Future<void> ShowMessageBox(
+    BuildContext context, String title, String message) {
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -188,16 +230,16 @@ Future<void> ShowMessageBox(BuildContext context, String title, String message) 
 }
 
 enum ConfirmAction { CANCEL, ACCEPT }
- 
-Future<ConfirmAction> ShowMessageBoxWithConfirm(BuildContext context, String title, String message) async {
+
+Future<ConfirmAction> ShowMessageBoxWithConfirm(
+    BuildContext context, String title, String message) async {
   return showDialog<ConfirmAction>(
     context: context,
     barrierDismissible: false, // user must tap button for close dialog!
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text(title),
-        content: Text(
-            message),
+        content: Text(message),
         actions: <Widget>[
           FlatButton(
             child: const Text('취소'),
@@ -216,4 +258,3 @@ Future<ConfirmAction> ShowMessageBoxWithConfirm(BuildContext context, String tit
     },
   );
 }
-

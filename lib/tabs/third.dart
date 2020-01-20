@@ -208,6 +208,9 @@ class ThirdTab extends StatefulWidget {
   @override
   ThirdTabState createState() => ThirdTabState();
 
+  sendData(String message, String value) =>
+      createState().onDataReceived(message, value);
+
   // @override
   // State<StatefulWidget> createState() {
   //   // TODO: implement createState
@@ -231,6 +234,20 @@ class ThirdTabState extends State<ThirdTab> {
   List<DemoItem<dynamic>> _demoItems;
   bool isNeedToSelect = false;
 
+  //다른화면에서 전달되는 데이터 처리
+  void onDataReceived(String message, String value) {
+    if (message == "SelectTitleData") {
+      SelectTitleList();
+    }
+  }
+
+  //타이틀 리스트를 재조회한다.
+  void SelectTitleList()
+  {
+    thrdBloc.SelectTitleList(CoreLibrary.userId);
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -238,7 +255,13 @@ class ThirdTabState extends State<ThirdTab> {
     if (thrdBloc != null) {
       thrdBloc.buildContext = context;
 
-      thrdBloc.SelectTitleList(thrdBloc.userId);
+      // () async {
+      //   await Future.delayed(Duration.zero);
+      //   thrdBloc.SelectTitleList(CoreLibrary.userId);
+      // }();
+
+      //thrdBloc.SelectTitleList(CoreLibrary.userId);
+
       this.isNeedToSelect = true;
     }
 
@@ -442,11 +465,12 @@ class ThirdTabState extends State<ThirdTab> {
                   Form.of(context).reset();
                   //ShowMessageBox(context, "확인", "정말 삭제하시겠습니까?");
                   String titlNm = title.titlNm;
-                  ShowMessageBoxWithConfirm(context, "삭제", "[$titlNm]\r\n\r\n정말 삭제하시겠습니까?")
+                  ShowMessageBoxWithConfirm(
+                          context, "삭제", "[$titlNm]\r\n\r\n정말 삭제하시겠습니까?")
                       .then((ConfirmAction onValue) {
                     if (onValue == ConfirmAction.ACCEPT) {
-                        //TODO 삭제처리 해야함..
-
+                      //타이틀 삭제
+                      thrdBloc.DeleteTitle(CoreLibrary.userId, title.stodNo);
                     } else if (onValue == ConfirmAction.CANCEL) {
                       //PASS
                     }
@@ -507,6 +531,7 @@ class ThirdTabState extends State<ThirdTab> {
 
   @override
   Widget build(BuildContext context) {
+    //super.build(context);
     // return StreamBuilder(
     //     stream: thrdBloc.getTitleList,
     //     builder: (BuildContext context, AsyncSnapshot<List<TitleDTO>> snapshot) {
@@ -556,7 +581,11 @@ class ThirdTabState extends State<ThirdTab> {
                     ),
                   ),
                 )
-              : new CircularProgressIndicator();
+              : new Container(
+                height: 50,
+                width: 50,
+                child: new CircularProgressIndicator(),
+              ); 
         });
   }
 }

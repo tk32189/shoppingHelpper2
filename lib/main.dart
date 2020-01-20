@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:showpinghelper/core/coreLibrary.dart';
 import 'package:showpinghelper/tabs/first.dart';
 import 'package:showpinghelper/tabs/second.dart';
 import 'package:showpinghelper/tabs/third.dart';
+import 'package:showpinghelper/tabs/userInfo.dart';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+
 
 void main() => runApp(MyApp());
 
@@ -59,9 +63,10 @@ class _MyHomePageState extends State<MyHomePage>
         //widget.ChangeTitle("")
         titleNmae = "쇼핑리스트";
       } else if (controller.index == 1) {
-        titleNmae = "아직미정";
-      } else if (controller.index == 2) {
         titleNmae = "히스토리";
+        thirdTab.sendData("SelectTitleData", "");
+      } else if (controller.index == 2) {
+        titleNmae = "내정보";
       }
     });
   }
@@ -80,10 +85,28 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
+
+
+    CoreLibrary core = new CoreLibrary();
+          core.AuthRead().then((value){
+            String result = value.toString();
+            if ( result != null && result.length > 0){
+              CoreLibrary.userId = result;
+
+              firstTab.sendData("SelectUserInfo", "");
+            }
+          });
+
+
     controller = new TabController(length: 3, vsync: this);
     controller.addListener(_setActiveTabIndex);
 
     FirstTab(key: animatedStateKey);
+
+    
+
+    //사용자 정보 확인
+     
 
     //this.globalKey = new GlobalKey();
   }
@@ -95,6 +118,7 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   FirstTab firstTab;
+  ThirdTab thirdTab;
 
 // FirstTab firstTab = new FirstTab(
 //     );
@@ -103,17 +127,21 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     firstTab = new FirstTab();
     SecondTab secondTab = new SecondTab();
-    ThirdTab thirdTab = new ThirdTab(
+    thirdTab = new ThirdTab(
       onResearch: ResearchButtonClick,
       firstTabStateKey: animatedStateKey,
     );
+
+    UserInfoTab userInfoTab = new UserInfoTab();
+    
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(titleNmae),
         backgroundColor: new Color(0xFFE57373),
       ),
       body: new TabBarView(
-        children: <Widget>[firstTab, secondTab, thirdTab],
+        children: <Widget>[firstTab, thirdTab, userInfoTab ],
         controller: controller,
       ),
       bottomNavigationBar: new Material(
@@ -130,16 +158,16 @@ class _MyHomePageState extends State<MyHomePage>
                 new Text("쇼핑리스트")
               ],
             )),
-            new Tab(
-                icon: new Row(
-              children: <Widget>[
-                new Icon(Icons.home),
-                new SizedBox(
-                  width: 10,
-                ),
-                new Text("아직미정")
-              ],
-            )),
+            // new Tab(
+            //     icon: new Row(
+            //   children: <Widget>[
+            //     new Icon(Icons.home),
+            //     new SizedBox(
+            //       width: 10,
+            //     ),
+            //     new Text("아직미정")
+            //   ],
+            // )),
             new Tab(
                 icon: new Row(
               children: <Widget>[
@@ -148,6 +176,16 @@ class _MyHomePageState extends State<MyHomePage>
                   width: 10,
                 ),
                 new Text("히스토리")
+              ],
+            )),
+            new Tab(
+                icon: new Row(
+              children: <Widget>[
+                new Icon(Icons.store_mall_directory),
+                new SizedBox(
+                  width: 10,
+                ),
+                new Text("내정보")
               ],
             ))
           ],
