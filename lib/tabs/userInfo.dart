@@ -3,10 +3,12 @@ import 'package:showpinghelper/bloc/orderBloc.dart';
 // import 'package:showpinghelper/core/popup.dart';
 // import 'package:showpinghelper/core/popup_content.dart';
 import 'package:showpinghelper/core/coreLibrary.dart';
+import 'package:showpinghelper/core/widgets.dart';
 import 'package:showpinghelper/datatable/post.dart';
 import 'package:showpinghelper/datatable/resultDataDTO.dart';
 import 'package:showpinghelper/popup/itemAdd.dart';
 import 'package:showpinghelper/popup/addUserInfo.dart';
+import 'package:showpinghelper/popup/login.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -14,6 +16,35 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class UserInfoTabState extends State<UserInfoTab> {
+/*--------------------------
+  // name : LoginPopupOpen
+  // title : 로그인 화면 팝업
+  // desc : 
+  ---------------------------*/
+  void LoginPopupOpen(BuildContext context) {
+    ResultData inputData = new ResultData();
+    // if (orderDto != null) {
+    //   inputData.resultObject = orderDto;
+    // }
+
+    Widget itemPopup = Login(context, inputData);
+
+    showPopup(context, itemPopup, "로그인").then<void>((Object value) {
+      if (value != null) {
+        ResultData resultData = value as ResultData;
+        String resultString = resultData.resultString;
+        if (resultString != null && resultString != "") {
+          setState(() {
+            CoreLibrary.userId = resultString;
+            CoreLibrary core = new CoreLibrary();
+            core.AuthWrite(CoreLibrary.userId);
+          });
+        }
+        // this.AddOrder(row);
+      }
+    });
+  }
+
   /*--------------------------
   // name : NewUserPopupOpen
   // title : 신규등록 화면 팝업
@@ -33,12 +64,10 @@ class UserInfoTabState extends State<UserInfoTab> {
         String resultString = resultData.resultString;
         if (resultString != null && resultString != "") {
           setState(() {
-          CoreLibrary.userId = resultString;
-          CoreLibrary core = new CoreLibrary();
-          core.AuthWrite(CoreLibrary.userId);
+            CoreLibrary.userId = resultString;
+            CoreLibrary core = new CoreLibrary();
+            core.AuthWrite(CoreLibrary.userId);
           });
-          
-
         }
         // this.AddOrder(row);
       }
@@ -52,26 +81,66 @@ class UserInfoTabState extends State<UserInfoTab> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.red[100],
+      backgroundColor: HexColor("#FFF6F4"),
+      //backgroundColor: Colors.,
       body: new Container(
         child: new Center(
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  //SizedBox(width: 20,),
+                  // FlatButton(
+                  //   color: Colors.black54,
+                  //   child: Text("신규등록"),
+                  //   onPressed: () {
+                  //     NewUserPopupOpen(context);
+                  //   },
+                  //   textTheme: ButtonTextTheme.primary,
+                  // ),
+                  SimpleOutlineButton(
+                    buttonText: "신규등록",
+                    isTokenIconVisible: false,
+                    onPressed: () {
+                      NewUserPopupOpen(context);
+                    },
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  // FlatButton(
+                  //   color: Colors.black54,
+                  //   child: Text("로그인"),
+                  //   onPressed: () {
+                  //     LoginPopupOpen(context);
+                  //   },
+                  //   textTheme: ButtonTextTheme.primary,
+                  // ),
+                  SimpleOutlineButton(
+                    buttonText: "로그인",
+                    isTokenIconVisible: false,
+                    onPressed: () {
+                      LoginPopupOpen(context);
+                    },
+                  ),
+                ],
+              ),
+
+              SizedBox(
+                height: 120,
+              ),
               Visibility(
                 visible: true,
                 child: Container(
                   height: 30,
-                  child: Text('${CoreLibrary.userId} 님 환영합니다.'),
+                  child: Text(
+                    '${CoreLibrary.userId} 님 환영합니다.',
+                    style: TextStyle(fontSize: 20),
+                  ),
                 ),
               ),
-
-              RaisedButton(
-                child: Text("신규등록"),
-                onPressed: () {
-                  NewUserPopupOpen(context);
-                },
-              )
               // Container(
               //     child: Card(
               //   margin: EdgeInsets.all(5),

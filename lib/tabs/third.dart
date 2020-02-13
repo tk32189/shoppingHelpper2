@@ -29,6 +29,7 @@ class CollapsibleBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //thrdBloc.SelectTitleList(CoreLibrary.userId);
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
     return Column(
@@ -37,7 +38,7 @@ class CollapsibleBody extends StatelessWidget {
           margin: const EdgeInsets.only(
                 left: 24.0,
                 right: 24.0,
-                bottom: 24.0,
+                bottom: 10.0,
               ) -
               margin,
           child: Center(
@@ -47,9 +48,12 @@ class CollapsibleBody extends StatelessWidget {
             ),
           ),
         ),
-        const Divider(height: 1.0),
+        const Divider(
+          height: 1.0,
+          color: Colors.black45,
+        ),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          padding: const EdgeInsets.symmetric(vertical: 7.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -121,10 +125,12 @@ class DualHeaderWithHint extends StatelessWidget {
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
-              child: Text(
-                name,
-                style: textTheme.body1.copyWith(fontSize: 15.0),
-              ),
+              child: Text(name,
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: HexColor(
+                          "#442C2E")) //textTheme.body1.copyWith(fontSize: 15.0),
+                  ),
             ),
           ),
         ),
@@ -133,8 +139,10 @@ class DualHeaderWithHint extends StatelessWidget {
           child: Container(
             margin: const EdgeInsets.only(left: 24.0),
             child: _crossFade(
-              Text(hint, style: textTheme.caption.copyWith(fontSize: 15.0)),
-              Text(hint, style: textTheme.caption.copyWith(fontSize: 15.0)),
+              Text(hint,
+                  style: TextStyle(fontSize: 15, color: HexColor("#442C2E"))),
+              Text(hint,
+                  style: TextStyle(fontSize: 15, color: HexColor("#442C2E"))),
               showHint,
             ),
           ),
@@ -229,6 +237,7 @@ class ThirdTab extends StatefulWidget {
 // }
 
 ThrdBloc thrdBloc = new ThrdBloc();
+String lastUserId = "";
 
 class ThirdTabState extends State<ThirdTab> {
   List<DemoItem<dynamic>> _demoItems;
@@ -242,11 +251,20 @@ class ThirdTabState extends State<ThirdTab> {
   }
 
   //타이틀 리스트를 재조회한다.
-  void SelectTitleList()
-  {
-    thrdBloc.SelectTitleList(CoreLibrary.userId);
+  void SelectTitleList() {
+    if (CoreLibrary.userId != null) {
+      thrdBloc.SelectTitleList(CoreLibrary.userId);
+    }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    //context.getElementForInheritedWidgetOfExactType();
+    // if ( CoreLibrary.userId != null){
+    //   thrdBloc.SelectTitleList(CoreLibrary.userId);
+    // }
+  }
 
   @override
   void initState() {
@@ -437,7 +455,7 @@ class ThirdTabState extends State<ThirdTab> {
   //타이틀 정보를 설정한다.
   DemoItem<String> TitleControlInit(TitleDTO title) {
     return DemoItem<String>(
-      name: title.ordrDirectDt,
+      name: title.showDt,
       value: title.stodNo,
       hint: title.titlNm,
       showDt: title.showDt,
@@ -480,16 +498,33 @@ class ThirdTabState extends State<ThirdTab> {
                 },
                 //455
                 child: Container(
+                  //color: Colors.red,
                   child: Column(
                     children: <Widget>[
-                      Text('쇼핑일 : ' + StringToDisplayDate(item.showDt)),
-                      SizedBox(
-                        height: 10,
-                      ),
+                      // Text(
+                      //   '쇼핑일 : ' + StringToDisplayDate(item.showDt),
+                      //   style: TextStyle(color: HexColor("#442C2E")),
+                      // ),
+                      // SizedBox(
+                      //   height: 10,
+                      // )
                       Text(
-                        item.getOrdrInfo(),
-                        style: TextStyle(fontSize: 20, color: Colors.black),
+                            item.getOrdrInfo(),
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 20, color: HexColor("#2B1B1C"))
+                          ),
+                      
+
+                      SizedBox(
+                        height: 30,
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          Text("등록일 : ${title.ordrDirectDt}  "),
+                        ],
+                      )
                       // Padding(
                       //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       //   child: TextFormField(
@@ -556,6 +591,7 @@ class ThirdTabState extends State<ThirdTab> {
           }
           return snapshot.hasData
               ? Scaffold(
+                  backgroundColor: HexColor("#FFF6F4"),
                   body: SingleChildScrollView(
                     child: SafeArea(
                       top: false,
@@ -582,10 +618,10 @@ class ThirdTabState extends State<ThirdTab> {
                   ),
                 )
               : new Container(
-                height: 50,
-                width: 50,
-                child: new CircularProgressIndicator(),
-              ); 
+                  height: 50,
+                  width: 50,
+                  child: new CircularProgressIndicator(),
+                );
         });
   }
 }

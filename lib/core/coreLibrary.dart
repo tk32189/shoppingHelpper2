@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:showpinghelper/core/popup.dart';
 import 'package:showpinghelper/core/popup_content.dart';
 import 'package:showpinghelper/datatable/resultDataDTO.dart';
@@ -8,8 +9,13 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
+
+
 class CoreLibrary {
   static String userId = ""; //
+  static bool isTestServer = true;
+
+  static String colorBrown = "#442C2E";
 
   /*--------------------------
   // name : AuthRead
@@ -37,6 +43,9 @@ class CoreLibrary {
 }
 
 String url = "http://10.0.2.2:3000/";
+String urlTestServer = "http://10.0.2.2:3000/";
+String urlServer = "http://shoppinghelper.cafe24app.com/";
+
 
 Future<Object> showPopup(BuildContext context, Widget widget, String title,
     {BuildContext popupContext}) async {
@@ -49,12 +58,15 @@ Future<Object> showPopup(BuildContext context, Widget widget, String title,
       bottom: 50,
       child: PopupContent(
         content: Scaffold(
+          backgroundColor: HexColor("#FFF6F4"),
           appBar: AppBar(
-            title: Text(title),
-            backgroundColor: Colors.green[300],
+            title: Text(title, style: GoogleFonts.jua(
+              textStyle: TextStyle(color: HexColor("#442C2E"))
+            ),),
+            backgroundColor: HexColor("FEDBD0"),
             leading: new Builder(builder: (context) {
               return IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back, color: HexColor("#442C2E"),),
                 onPressed: () {
                   try {
                     Navigator.pop(context, "test"); //close the popup
@@ -82,6 +94,19 @@ Future<Object> showPopup(BuildContext context, Widget widget, String title,
 Future<dynamic> CallService(
     BuildContext buildContext, String connectKey, Map body) async {
 
+
+      
+        //buildContext.dependOnInheritedWidgetOfExactType()
+      
+      
+
+      if ( CoreLibrary.isTestServer == true){
+          url = urlTestServer;
+      }
+      else{
+        url = urlServer;
+      }
+
   return await http.post(Uri.encodeFull(url + connectKey),
       body: body,
       headers: {"Accept": "application/json"}).then((http.Response response) {
@@ -105,6 +130,15 @@ Future<dynamic> CallService(
   ---------------------------*/
 dynamic CallServiceSync(
     BuildContext buildContext, String connectKey, Map body) async {
+
+      if ( CoreLibrary.isTestServer == true){
+          url = urlTestServer;
+      }
+      else{
+        url = urlServer;
+      }
+
+
   return await http.post(Uri.encodeFull(url + connectKey),
       body: body,
       headers: {"Accept": "application/json"}).then((http.Response response) {
@@ -218,7 +252,7 @@ Future<void> ShowMessageBox(
         content: Text(message),
         actions: <Widget>[
           FlatButton(
-            child: Text('Ok'),
+            child: Text('OK'),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -258,3 +292,17 @@ Future<ConfirmAction> ShowMessageBoxWithConfirm(
     },
   );
 }
+
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF" + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+}
+

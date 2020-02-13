@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:showpinghelper/core/coreLibrary.dart';
 import 'package:showpinghelper/datatable/orderDTO.dart';
@@ -17,19 +18,20 @@ class FirstBloc {
   final _orderSubject = BehaviorSubject<List<OrderDTO>>();
   final _titleNmSubJect = BehaviorSubject<String>();
   final _showDtSubject = BehaviorSubject<DateTime>();
+  final _exptMoneySubject =
+      BehaviorSubject<String>(); //  String exptMoney = "0";
   //final _stodNoSubject = BehaviorSubject<String>();
   Stream<List<OrderDTO>> get resultList => _orderSubject.stream;
   Stream<String> get getTitleNm => _titleNmSubJect.stream;
   Stream<DateTime> get getShowDt => _showDtSubject.stream;
+  Stream<String> get getExptMoney => _exptMoneySubject.stream;
   setTitleNm(String titleNm) {
     _titleNmSubJect.add(titleNm);
   }
 
-  setShowDt(DateTime datetime){
+  setShowDt(DateTime datetime) {
     _showDtSubject.add(datetime);
   }
-
-
 
   BuildContext buildContext;
 
@@ -42,6 +44,8 @@ class FirstBloc {
   //String titleNm = "";
 
   String url = "http://10.0.2.2:3000/";
+  String urlTestServer = "http://10.0.2.2:3000/";
+  String urlServer = "http://shoppinghelper.cafe24app.com/";
 
   FirstBloc() {
     // OrderDTO dto = new OrderDTO();
@@ -69,6 +73,7 @@ class FirstBloc {
     // orderList.add(dto);
 
     _orderSubject.add(orderList);
+    SumExptMoney();
 
     if (CoreLibrary.userId != null && CoreLibrary.userId != "") {
       this.SelectLastStodNo(CoreLibrary.userId); //마지막 stodNO조회
@@ -100,6 +105,32 @@ class FirstBloc {
     }
 
     _orderSubject.add(orderList);
+    SumExptMoney();
+  }
+
+  /*--------------------------
+  // name : SumExptMoney
+  // title : 예상금액 표시
+  // desc :
+  ---------------------------*/
+  void SumExptMoney() {
+    int moneySum = 0;
+    if (orderList != null && orderList.length > 0) {
+      for (int i = 0; i < orderList.length; i++) {
+        OrderDTO dto = orderList.elementAt(i);
+        int tempMoney = 0;
+        if (dto.exptPrice != null && dto.exptPrice.length > 0) {
+          tempMoney = int.parse(dto.exptPrice);
+        }
+
+        moneySum = moneySum + tempMoney;
+      }
+    }
+
+    final f = new NumberFormat("#,###");
+    String exptPriceFormated = f.format(moneySum);
+
+    _exptMoneySubject.add(exptPriceFormated);
   }
 
   /*--------------------------
@@ -171,6 +202,7 @@ class FirstBloc {
     }
 
     _orderSubject.add(orderList);
+    SumExptMoney();
   }
 
   /*--------------------------
@@ -222,6 +254,7 @@ class FirstBloc {
     this._orderSubject.add(orderList);
     this._titleNmSubJect.add("");
     this._showDtSubject.add(DateTime.now());
+    SumExptMoney();
   }
 
   /*--------------------------
@@ -229,8 +262,7 @@ class FirstBloc {
   // title : stodNo에 해당하는 데이터를 조회한다.
   // desc : 
   ---------------------------*/
-  void SelectTitleInfo(String stodNo)
-  {
+  void SelectTitleInfo(String stodNo) {
     this.SelectShowpingData(CoreLibrary.userId, stodNo);
   }
 
@@ -300,12 +332,9 @@ class FirstBloc {
         this.stodNo = result["stodNo"].toString();
       }
 
-      if ( result.containsKey("showDt")){
-
-          DateTime dt = DateTime.parse(result["showDt"].toString());
+      if (result.containsKey("showDt")) {
+        DateTime dt = DateTime.parse(result["showDt"].toString());
         _showDtSubject.add(dt);
-
-
       }
 
       if (result.containsKey("orderData")) {
@@ -324,6 +353,7 @@ class FirstBloc {
 
           this.orderList = orderList;
           _orderSubject.add(orderList);
+          SumExptMoney();
         }
       }
     }
@@ -423,6 +453,12 @@ class FirstBloc {
   // desc : 
   ---------------------------*/
   Future<dynamic> CallService(String connectKey, Map body) async {
+    if (CoreLibrary.isTestServer == true) {
+      url = urlTestServer;
+    } else {
+      url = urlServer;
+    }
+
     return await http.post(Uri.encodeFull(url + connectKey),
         body: body,
         headers: {"Accept": "application/json"}).then((http.Response response) {

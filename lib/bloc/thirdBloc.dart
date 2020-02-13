@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:showpinghelper/datatable/titleDTO.dart';
@@ -78,6 +76,8 @@ class ThrdBloc {
     if (userId != null && userId != "") {
       map["usrId"] = userId;
     }
+
+    if ( this.buildContext == null) return false;
 
     dynamic result = await CallService(this.buildContext, "SelectTitle", map);
 
